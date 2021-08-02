@@ -14,3 +14,9 @@
 # Maven
 log/
 target/
+
+# Gradle
+.gradle/
+
+# Build
+bin/
