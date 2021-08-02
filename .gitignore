@@ -20,3 +20,4 @@ target/
 
 # Build
 bin/
+build/
