@@ -13,9 +13,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class Main extends JavaPlugin implements Listener {
+    HashMap<UUID, ArmorStand> armorStands = new HashMap<>();
+
     @Override
     public void onLoad() {
         super.onLoad();
@@ -38,20 +41,15 @@ public class Main extends JavaPlugin implements Listener {
         super.onDisable();
     }
 
-    HashMap<String, ArmorStand> armorStands = new HashMap<>();
-
-    public boolean armorStandExist(String uuid) {
-        if(armorStands.get(uuid) != null) {
-            return true;
-        }
-        return false;
-    }
-
-    public ArmorStand getArmorStand(String uuid) {
+    public ArmorStand getArmorStand(UUID uuid) {
         return armorStands.get(uuid);
     }
 
-    public boolean armorStandDead(String uuid) {
+    public boolean armorStandExist(UUID uuid) {
+        return armorStands.get(uuid) != null;
+    }
+
+    public boolean armorStandDead(UUID uuid) {
         if(armorStandExist(uuid)) {
             return getArmorStand(uuid).isDead();
         }
@@ -60,7 +58,7 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        String uuid = e.getPlayer().getUniqueId().toString();
+        UUID uuid = e.getPlayer().getUniqueId();
         if(armorStandExist(uuid) && !armorStandDead(uuid)) {
             getLogger().info("Move!");
 
@@ -68,7 +66,7 @@ public class Main extends JavaPlugin implements Listener {
             Vector newLocVec = newLoc.getDirection().multiply(2);
             getArmorStand(uuid).teleport(newLoc.add(newLocVec));
             getLogger().info("Set stand spot!");
-            getLogger().info("Placed at: "+newLoc);
+            getLogger().info("Placed at: " + newLoc);
         } else {
             ArmorStand stand = (ArmorStand) e.getPlayer().getWorld().spawnEntity(e.getTo(), EntityType.ARMOR_STAND);
             stand.setGravity(false);
@@ -80,7 +78,7 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
-        String uuid = e.getPlayer().getUniqueId().toString();
+        UUID uuid = e.getPlayer().getUniqueId();
         if(armorStandExist(uuid)) {
             getArmorStand(uuid).remove();
             armorStands.remove(uuid);
