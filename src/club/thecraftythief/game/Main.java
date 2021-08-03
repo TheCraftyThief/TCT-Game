@@ -6,10 +6,13 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class Main extends JavaPlugin implements Listener {
@@ -35,22 +38,52 @@ public class Main extends JavaPlugin implements Listener {
         super.onDisable();
     }
 
-    ArmorStand stand;
+    HashMap<String, ArmorStand> armorStands = new HashMap<>();
+
+    public boolean armorStandExist(String uuid) {
+        if(armorStands.get(uuid) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    public ArmorStand getArmorStand(String uuid) {
+        return armorStands.get(uuid);
+    }
+
+    public boolean armorStandDead(String uuid) {
+        if(armorStandExist(uuid)) {
+            return getArmorStand(uuid).isDead();
+        }
+        return true;
+    }
+
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
+        String uuid = e.getPlayer().getUniqueId().toString();
+        if(armorStandExist(uuid) && !armorStandDead(uuid)) {
+            getLogger().info("Move!");
 
-        getLogger().info("Move!");
-
-        if(stand == null) {
-            stand = (ArmorStand) e.getPlayer().getWorld().spawnEntity(e.getTo(), EntityType.ARMOR_STAND);
+            Location newLoc = e.getTo().clone();
+            Vector newLocVec = newLoc.getDirection().multiply(2);
+            getArmorStand(uuid).teleport(newLoc.add(newLocVec));
+            getLogger().info("Set stand spot!");
+            getLogger().info("Placed at: "+newLoc);
+        } else {
+            ArmorStand stand = (ArmorStand) e.getPlayer().getWorld().spawnEntity(e.getTo(), EntityType.ARMOR_STAND);
             stand.setGravity(false);
+            armorStands.remove(uuid);
+            armorStands.put(uuid, stand);
             getLogger().info("Armor stand made!");
         }
+    }
 
-        Location newLoc = e.getTo().clone();
-        Vector newLocVec = newLoc.getDirection().multiply(2);
-        stand.teleport(newLoc.add(newLocVec));
-        getLogger().info("Set stand spot!");
-        getLogger().info("Placed at: "+newLoc);
+    @EventHandler
+    public void onLeave(PlayerQuitEvent e) {
+        String uuid = e.getPlayer().getUniqueId().toString();
+        if(armorStandExist(uuid)) {
+            getArmorStand(uuid).remove();
+            armorStands.remove(uuid);
+        }
     }
 }
