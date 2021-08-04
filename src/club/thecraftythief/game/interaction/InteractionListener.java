@@ -24,10 +24,10 @@ public class InteractionListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         String standID = DataStore.read(player, CARRY_KEY);
-        if(standID != null) {
+        if (standID != null) {
             UUID standUUID = UUID.fromString(standID);
             Entity ent = Bukkit.getEntity(standUUID);
-            if(ent instanceof ArmorStand) {
+            if (ent instanceof ArmorStand) {
                 Location newLoc = event.getTo().clone();
                 Vector newLocVec = newLoc.getDirection().multiply(2);
                 ent.teleport(newLoc.add(newLocVec));
@@ -40,10 +40,9 @@ public class InteractionListener implements Listener {
         Player player = event.getPlayer();
         ArmorStand stand = event.getEntity();
         String standID = DataStore.read(player, CARRY_KEY);
-        if(standID == null) {
+        if (standID == null) {
             DataStore.store(player, CARRY_KEY, stand.getUniqueId().toString());
-        }
-        else {
+        } else {
             DataStore.clear(player, CARRY_KEY);
         }
     }
