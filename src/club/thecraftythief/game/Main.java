@@ -1,8 +1,7 @@
 package club.thecraftythief.game;
 
-import club.thecraftythief.game.models.*;
 import club.thecraftythief.engine.model.ModelMgr;
-
+import club.thecraftythief.game.models.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
