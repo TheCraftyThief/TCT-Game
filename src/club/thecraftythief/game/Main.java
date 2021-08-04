@@ -3,19 +3,17 @@ package club.thecraftythief.game;
 import club.thecraftythief.game.models.*;
 import club.thecraftythief.engine.model.ModelMgr;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class Main extends JavaPlugin implements Listener {
+    HashMap<UUID, ArmorStand> armorStands = new HashMap<>();
+
     @Override
     public void onLoad() {
         super.onLoad();
