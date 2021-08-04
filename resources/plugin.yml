@@ -2,3 +2,5 @@ name: TCT-Game
 version: 1.0.0
 api-version: 1.17
 main: club.thecraftythief.game.Main
+depend:
+  - TCT-Engine

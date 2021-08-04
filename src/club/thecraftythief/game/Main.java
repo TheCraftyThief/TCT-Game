@@ -1,5 +1,8 @@
 package club.thecraftythief.game;
 
+import club.thecraftythief.game.models.*;
+import club.thecraftythief.engine.model.ModelMgr;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -26,31 +29,21 @@ public class Main extends JavaPlugin implements Listener {
         super.onEnable();
         Logger log = getLogger();
         log.info("Enabling TCT-Game");
-        Bukkit.getPluginManager().registerEvents(this, this);
+
+        ModelMgr.getInstance().registerModel(new ComputerTowerModel());
+        ModelMgr.getInstance().registerModel(new GoldBarModel());
+        ModelMgr.getInstance().registerModel(new PhoneModel());
+        ModelMgr.getInstance().registerModel(new RubiksCubeModel());
+        ModelMgr.getInstance().registerModel(new CashModel());
+        ModelMgr.getInstance().registerModel(new LaptopModel());
+        ModelMgr.getInstance().registerModel(new TVModel());
+        ModelMgr.getInstance().registerModel(new KeyModel());
+
         log.info("TCT-Game enabled");
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
-    }
-
-    ArmorStand stand;
-    @EventHandler
-    public void onMove(PlayerMoveEvent e) {
-
-        getLogger().info("Move!");
-
-        if(stand == null) {
-            stand = (ArmorStand) e.getPlayer().getWorld().spawnEntity(e.getTo(), EntityType.ARMOR_STAND);
-            stand.setGravity(false);
-            getLogger().info("Armor stand made!");
-        }
-
-        Location newLoc = e.getTo().clone();
-        Vector newLocVec = newLoc.getDirection().multiply(2);
-        stand.teleport(newLoc.add(newLocVec));
-        getLogger().info("Set stand spot!");
-        getLogger().info("Placed at: "+newLoc);
     }
 }

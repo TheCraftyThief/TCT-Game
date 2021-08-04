@@ -1,11 +1,11 @@
 plugins {
-    id 'java'
+    id "java"
 }
 
-apply plugin: 'java'
+apply plugin: "java"
 
-group 'club.thecraftythief.game'
-version '1.0-SNAPSHOT'
+group "club.thecraftythief.game"
+version "1.0-SNAPSHOT"
 
 sourceCompatibility = 16
 targetCompatibility = 16
@@ -13,20 +13,21 @@ targetCompatibility = 16
 sourceSets {
     main {
         java {
-            srcDirs = ['src']
+            srcDirs = ["src"]
         }
         resources {
-            srcDirs = ['resources']
+            srcDirs = ["resources"]
         }
     }
 }
 
 repositories {
     maven {
-        url 'https://papermc.io/repo/repository/maven-public/'
+        url "https://papermc.io/repo/repository/maven-public/"
     }
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly "io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT"
+    compileOnly project(":TCT-Engine")
 }
