@@ -59,6 +59,6 @@ public class Main extends JavaPlugin implements Listener {
         ArmorStand stand = e.getEntity();
         Player player = e.getPlayer();
 
-        player.sendMessage("Hi \""+player.getName()+"\", you clicked on a \""+data.getModelName()+"\" model! This model is held by the ArmorStand \""+stand.getUniqueId()+"\"!");
+        player.sendMessage("Hi \"" + player.getName() + "\", you clicked on a \"" + data.getModelName() + "\" model! This model is held by the ArmorStand \"" + stand.getUniqueId() + "\"!");
     }
 }
