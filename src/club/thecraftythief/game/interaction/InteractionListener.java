@@ -1,6 +1,7 @@
 package club.thecraftythief.game.interaction;
 
 import club.thecraftythief.engine.data.DataStore;
+import club.thecraftythief.engine.model.ModelMgr;
 import club.thecraftythief.engine.model.events.ModelInteractEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,25 +13,31 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
+import javax.xml.crypto.Data;
+import java.util.List;
 import java.util.UUID;
 
 public class InteractionListener implements Listener {
 
-    //TODO: Check if a player is already carrying the item! This is kinda critical :)
-
-    private final static String CARRY_KEY = "carrying_stand";
+    private final static String BEING_CARRIED_KEY = "being_carried";
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        String standID = DataStore.read(player, CARRY_KEY);
-        if(standID != null) {
-            UUID standUUID = UUID.fromString(standID);
-            Entity ent = Bukkit.getEntity(standUUID);
-            if(ent instanceof ArmorStand) {
+        List<ArmorStand> modelStands = ModelMgr.getInstance().getSpawnedModels(player.getWorld());
+        ArmorStand carryingStand = null;
+        //Using this to iterate to avoid making copies
+        for(int i = 0; i < modelStands.size(); i++) {
+            ArmorStand current = modelStands.get(i);
+            String uuidStr = DataStore.read(current, BEING_CARRIED_KEY);
+            if(uuidStr == null) {
+                continue;
+            }
+            UUID carrierUUID = UUID.fromString(uuidStr);
+            if(carrierUUID.equals(player.getUniqueId())) {
                 Location newLoc = event.getTo().clone();
                 Vector newLocVec = newLoc.getDirection().multiply(2);
-                ent.teleport(newLoc.add(newLocVec));
+                current.teleport(newLoc.add(newLocVec));
             }
         }
     }
@@ -39,12 +46,28 @@ public class InteractionListener implements Listener {
     public void onModelClick(ModelInteractEvent event) {
         Player player = event.getPlayer();
         ArmorStand stand = event.getEntity();
-        String standID = DataStore.read(player, CARRY_KEY);
-        if(standID == null) {
-            DataStore.store(player, CARRY_KEY, stand.getUniqueId().toString());
+        String carrierID = DataStore.read(stand, BEING_CARRIED_KEY);
+        if(carrierID != null) {
+            UUID carrierUUID = UUID.fromString(carrierID);
+            if(carrierUUID.equals(player.getUniqueId())) {
+                DataStore.clear(stand, BEING_CARRIED_KEY);
+            }
         }
         else {
-            DataStore.clear(player, CARRY_KEY);
+            List<ArmorStand> modelStands = ModelMgr.getInstance().getSpawnedModels(player.getWorld());
+            for(int i = 0; i < modelStands.size(); i++) {
+                ArmorStand current = modelStands.get(i);
+                if(!current.getUniqueId().equals(stand.getUniqueId())) {
+                    String currentCarrierID = DataStore.read(current, BEING_CARRIED_KEY);
+                    if(currentCarrierID != null) {
+                        UUID carrierUUID = UUID.fromString(currentCarrierID);
+                        if(player.getUniqueId().equals(carrierUUID)) {
+                            return;
+                        }
+                    }
+                }
+            }
+            DataStore.store(stand, BEING_CARRIED_KEY, player.getUniqueId().toString());
         }
     }
 }
