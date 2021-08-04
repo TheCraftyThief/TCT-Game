@@ -3,6 +3,7 @@ package club.thecraftythief.game;
 import club.thecraftythief.engine.model.ModelData;
 import club.thecraftythief.engine.model.ModelMgr;
 import club.thecraftythief.engine.model.events.ModelInteractEvent;
+import club.thecraftythief.game.interaction.InteractionListener;
 import club.thecraftythief.game.models.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
@@ -42,6 +43,7 @@ public class Main extends JavaPlugin implements Listener {
         ModelMgr.getInstance().registerModel(new KeyModel());
 
         Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(new InteractionListener(), this);
 
         log.info("TCT-Game enabled");
     }
