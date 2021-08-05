@@ -41,6 +41,7 @@ public class Main extends JavaPlugin implements Listener {
         ModelMgr.getInstance().registerModel(new LaptopModel());
         ModelMgr.getInstance().registerModel(new TVModel());
         ModelMgr.getInstance().registerModel(new KeyModel());
+        ModelMgr.getInstance().registerModel(new AmongUsModel());
 
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new InteractionListener(), this);

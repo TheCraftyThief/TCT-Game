@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -21,9 +22,7 @@ public class InteractionListener implements Listener {
 
     private final static String BEING_CARRIED_KEY = "being_carried";
 
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
+    private ArmorStand getCarrying(Player player) {
         List<ArmorStand> modelStands = ModelMgr.getInstance().getSpawnedModels(player.getWorld());
         ArmorStand carryingStand = null;
         //Using this to iterate to avoid making copies
@@ -35,10 +34,45 @@ public class InteractionListener implements Listener {
             }
             UUID carrierUUID = UUID.fromString(uuidStr);
             if(carrierUUID.equals(player.getUniqueId())) {
-                Location newLoc = event.getTo().clone();
-                Vector newLocVec = newLoc.getDirection().multiply(2);
-                current.teleport(newLoc.add(newLocVec));
+                //Dont change rotation
+                return current;
             }
+        }
+        return null;
+    }
+    @EventHandler
+    public void onScroll(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        ArmorStand carrying = getCarrying(player);
+        if(carrying == null) {
+            return;
+        }
+        event.setCancelled(true);
+        player.getInventory().setHeldItemSlot(4);
+
+        int newSlot = event.getNewSlot();
+        int oldSlot = event.getPreviousSlot();
+        int difference = newSlot-oldSlot;
+
+        float yaw = carrying.getLocation().getYaw();
+        float pitch = carrying.getLocation().getPitch();
+        double diffSq = Math.pow(difference, 2);
+        yaw += (difference < 0 ? -diffSq : diffSq);
+        carrying.setRotation(yaw, pitch);
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        ArmorStand carrying = getCarrying(player);
+        if(carrying != null){
+            //Dont change rotation
+            float yaw = carrying.getLocation().getYaw();
+            float pitch = carrying.getLocation().getPitch();
+            Location newLoc = event.getTo().clone();
+            Vector newLocVec = newLoc.getDirection().multiply(2);
+            carrying.teleport(newLoc.add(newLocVec));
+            carrying.setRotation(yaw, pitch);
         }
     }
 
@@ -68,6 +102,7 @@ public class InteractionListener implements Listener {
                 }
             }
             DataStore.store(stand, BEING_CARRIED_KEY, player.getUniqueId().toString());
+            player.getInventory().setHeldItemSlot(4);
         }
     }
 }
