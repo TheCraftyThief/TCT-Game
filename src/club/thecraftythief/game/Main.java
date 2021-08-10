@@ -53,13 +53,4 @@ public class Main extends JavaPlugin implements Listener {
     public void onDisable() {
         super.onDisable();
     }
-
-    @EventHandler
-    public void onModelInteract(ModelInteractEvent e) {
-        ModelData data = e.getModel();
-        ArmorStand stand = e.getEntity();
-        Player player = e.getPlayer();
-
-        player.sendMessage("Hi \"" + player.getName() + "\", you clicked on a \"" + data.getModelName() + "\" model! This model is held by the ArmorStand \"" + stand.getUniqueId() + "\"!");
-    }
 }
