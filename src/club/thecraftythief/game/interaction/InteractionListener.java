@@ -1,8 +1,10 @@
 package club.thecraftythief.game.interaction;
 
 import club.thecraftythief.engine.data.DataStore;
+import club.thecraftythief.engine.entity.Model;
 import club.thecraftythief.engine.model.ModelMgr;
 import club.thecraftythief.engine.model.events.ModelInteractEvent;
+import club.thecraftythief.engine.player.PlayerWrapper;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -17,31 +19,10 @@ import java.util.UUID;
 
 public class InteractionListener implements Listener {
 
-    private final static String BEING_CARRIED_KEY = "being_carried";
-
-    private ArmorStand getCarrying(Player player) {
-        List<ArmorStand> modelStands = ModelMgr.getInstance().getSpawnedModels(player.getWorld());
-        ArmorStand carryingStand = null;
-        //Using this to iterate to avoid making copies
-        for (int i = 0; i < modelStands.size(); i++) {
-            ArmorStand current = modelStands.get(i);
-            String uuidStr = DataStore.read(current, BEING_CARRIED_KEY);
-            if (uuidStr == null) {
-                continue;
-            }
-            UUID carrierUUID = UUID.fromString(uuidStr);
-            if (carrierUUID.equals(player.getUniqueId())) {
-                //Dont change rotation
-                return current;
-            }
-        }
-        return null;
-    }
-
     @EventHandler
     public void onScroll(PlayerItemHeldEvent event) {
-        Player player = event.getPlayer();
-        ArmorStand carrying = getCarrying(player);
+        PlayerWrapper player = new PlayerWrapper(event.getPlayer());
+        Model carrying = player.getCarrying();
         if (carrying == null) {
             return;
         }
@@ -61,8 +42,8 @@ public class InteractionListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        ArmorStand carrying = getCarrying(player);
+        PlayerWrapper player = new PlayerWrapper(event.getPlayer());
+        Model carrying = player.getCarrying();
         if (carrying != null) {
             //Dont change rotation
             float yaw = carrying.getLocation().getYaw();
@@ -76,29 +57,17 @@ public class InteractionListener implements Listener {
 
     @EventHandler
     public void onModelClick(ModelInteractEvent event) {
-        Player player = event.getPlayer();
-        ArmorStand stand = event.getEntity();
-        String carrierID = DataStore.read(stand, BEING_CARRIED_KEY);
-        if (carrierID != null) {
-            UUID carrierUUID = UUID.fromString(carrierID);
-            if (carrierUUID.equals(player.getUniqueId())) {
-                DataStore.clear(stand, BEING_CARRIED_KEY);
+        PlayerWrapper player = event.getPlayer();
+        Model stand = event.getEntity();
+        if (stand.getCarrier() != null) {
+            if(stand.getCarrier().getUniqueId().equals(player.getUniqueId())) {
+                stand.setCarrier(null);
             }
         } else {
-            List<ArmorStand> modelStands = ModelMgr.getInstance().getSpawnedModels(player.getWorld());
-            for (int i = 0; i < modelStands.size(); i++) {
-                ArmorStand current = modelStands.get(i);
-                if (!current.getUniqueId().equals(stand.getUniqueId())) {
-                    String currentCarrierID = DataStore.read(current, BEING_CARRIED_KEY);
-                    if (currentCarrierID != null) {
-                        UUID carrierUUID = UUID.fromString(currentCarrierID);
-                        if (player.getUniqueId().equals(carrierUUID)) {
-                            return;
-                        }
-                    }
-                }
+            if(player.getCarrying() != null) {
+                return;
             }
-            DataStore.store(stand, BEING_CARRIED_KEY, player.getUniqueId().toString());
+            stand.setCarrier(player);
             player.getInventory().setHeldItemSlot(4);
         }
     }

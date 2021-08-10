@@ -1,5 +1,6 @@
 package club.thecraftythief.game;
 
+import club.thecraftythief.engine.Engine;
 import club.thecraftythief.engine.model.ModelData;
 import club.thecraftythief.engine.model.ModelMgr;
 import club.thecraftythief.engine.model.events.ModelInteractEvent;
@@ -33,15 +34,17 @@ public class Main extends JavaPlugin implements Listener {
         Logger log = getLogger();
         log.info("Enabling TCT-Game");
 
-        ModelMgr.getInstance().registerModel(new ComputerTowerModel());
-        ModelMgr.getInstance().registerModel(new GoldBarModel());
-        ModelMgr.getInstance().registerModel(new PhoneModel());
-        ModelMgr.getInstance().registerModel(new RubiksCubeModel());
-        ModelMgr.getInstance().registerModel(new CashModel());
-        ModelMgr.getInstance().registerModel(new LaptopModel());
-        ModelMgr.getInstance().registerModel(new TVModel());
-        ModelMgr.getInstance().registerModel(new KeyModel());
-        ModelMgr.getInstance().registerModel(new AmongUsModel());
+        Engine.getInstance().getModelManager().registerModel(new ComputerTowerModel());
+        Engine.getInstance().getModelManager().registerModel(new GoldBarModel());
+        Engine.getInstance().getModelManager().registerModel(new PhoneModel());
+        Engine.getInstance().getModelManager().registerModel(new RubiksCubeModel());
+        Engine.getInstance().getModelManager().registerModel(new CashModel());
+        Engine.getInstance().getModelManager().registerModel(new LaptopModel());
+        Engine.getInstance().getModelManager().registerModel(new TVModel());
+        Engine.getInstance().getModelManager().registerModel(new KeyModel());
+        Engine.getInstance().getModelManager().registerModel(new AmongUsModel());
+        Engine.getInstance().getModelManager().registerModel(new CreditCardModel());
+        Engine.getInstance().getModelManager().registerModel(new PinkCupModel());
 
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new InteractionListener(), this);
