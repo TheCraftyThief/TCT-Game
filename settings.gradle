@@ -1,4 +1,0 @@
-include(":TCT-Engine")
-project(":TCT-Engine").projectDir = file("../TCT-Engine")
-
-rootProject.name = "game"
